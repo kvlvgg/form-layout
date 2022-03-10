@@ -183,3 +183,62 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
 
 ![image](https://user-images.githubusercontent.com/80147461/157754440-e6b988b0-af79-4742-84c7-330052a3a6d9.png)
+
+#### Complex layout
+
+```
+<FormLayout>
+    <FormLayoutColumn :colspan="2">
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell :colspan="2" :rowspan="3">
+            <PlaceHolder :colspan="2" />
+        </FormLayoutCell>
+
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+    </FormLayoutColumn>
+
+    <FormLayoutColumn>
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell />
+
+        <FormLayoutCell :rowspan="2">
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell :rowspan="2">
+            <PlaceHolder />
+        </FormLayoutCell>
+    </FormLayoutColumn>
+
+    <FormLayoutColumn>
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+
+        <FormLayoutCell />
+
+        <FormLayoutCell>
+            <PlaceHolder />
+        </FormLayoutCell>
+    </FormLayoutColumn>
+</FormLayout>
+```
+
+![image](https://user-images.githubusercontent.com/80147461/157755832-7fd949c8-1dca-43d1-a9bc-c1ba76a68a27.png)
+

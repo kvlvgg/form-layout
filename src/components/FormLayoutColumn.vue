@@ -26,8 +26,7 @@ export default class FormLayoutColumn extends Vue {
             if (x.$vnode.componentOptions?.tag !== 'FormLayoutCell') isUsageError = true;
         });
 
-        if (isUsageError)
-            console.error('Дочерними элементами v-form-layout-column могут быть только v-form-layout-cell');
+        if (isUsageError) console.error('Дочерними элементами FormLayoutColumn могут быть только FormLayoutCell');
     }
 
     @Watch('isVisible')

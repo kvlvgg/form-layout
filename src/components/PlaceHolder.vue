@@ -1,5 +1,7 @@
 <template>
-    <div :style="placeholderStyle" :class="$style.filler" />
+    <div :style="placeholderStyle" :class="$style.filler">
+        {{ text }}
+    </div>
 </template>
 
 <script lang="ts">
@@ -9,6 +11,7 @@ import FormLayout from '@/components/FormLayout.vue';
 // Компонент для демонстрации шаблона
 @Component
 export default class Placeholder extends Vue {
+    @Prop({ type: String, default: null }) text!: number;
     @Prop({ type: Number, default: 1 }) colspan!: number;
 
     get layout() {
@@ -22,6 +25,12 @@ export default class Placeholder extends Vue {
     get placeholderStyle() {
         return {
             height: `calc(${this.$style[`height`]} * ${this.colspan} + ${this.rowDistance} * ${this.colspan - 1})`,
+            'background-color': `#${Math.floor(Math.random() * 1_000_000)}`,
+            display: 'flex',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'font-size': '30px',
+            color: 'black',
         };
     }
 }
@@ -45,6 +54,6 @@ export default class Placeholder extends Vue {
         xl: $distance-xl;
     }
 
-    height: 32px;
+    height: 56px;
 }
 </style>

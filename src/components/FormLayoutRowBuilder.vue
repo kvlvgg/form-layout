@@ -1,12 +1,7 @@
-<template>
-    <div ref="layout" :class="$style['form-layout']" :style="layoutStyle">
-        <slot />
-    </div>
-</template>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import FormLayoutColumn from '@/components/FormLayoutColumn.vue';
+import FormLayoutRow from '@/components/FormLayoutRow.vue';
+import { CreateElement, VNode } from 'vue';
 
 @Component
 export default class FormLayout extends Vue {
@@ -16,7 +11,13 @@ export default class FormLayout extends Vue {
     @Prop({ type: Boolean, default: false }) rowAutoSize!: boolean;
     @Prop({ type: Boolean, default: false }) isLoading!: boolean;
 
-    $children!: FormLayoutColumn[];
+    @Prop({ type: Array, default: () => [] }) rowsssss!: VNode[];
+
+    render(h: CreateElement) {
+        return h('div', { ref: 'layout', class: this.$style['form-layout'], style: this.layoutStyle }, [this.rowsssss]);
+    }
+
+    $children!: FormLayoutRow[];
     $refs!: {
         layout: HTMLDivElement;
     };
@@ -30,7 +31,11 @@ export default class FormLayout extends Vue {
     };
 
     private get columns() {
-        return this.$children.filter(x => x.isVisible);
+        return this.$children.filter(x => x.isVisible && x.role === 'column');
+    }
+
+    private get rows() {
+        return this.$children.filter(x => x.isVisible && x.role === 'row');
     }
 
     private mounted() {
@@ -55,6 +60,7 @@ export default class FormLayout extends Vue {
     }
 
     private buildLayout() {
+        console.log('this.$isIE', this.$isIE);
         this.calculateCellsPositions();
         if (!this.$isIE) this.buildGridTemplate();
         else this.buildGridTemplateForIE();
@@ -69,6 +75,15 @@ export default class FormLayout extends Vue {
                 cell['column-start'] = columnIndex + 1;
                 cell['column-span'] = cell.rowspan;
                 cell['row-start'] = aboveGridRowEnd + rowOffset;
+                cell['row-span'] = cell.colspan;
+            });
+        });
+
+        this.rows.forEach((row, rowIndex) => {
+            this.getVisibleCells(row).forEach((cell, cellIndex) => {
+                cell['column-start'] = cellIndex + 1; // если cell.rowspan > 1, надо вычислять
+                cell['column-span'] = cell.rowspan;
+                cell['row-start'] = rowIndex + 1; // если cell.colspan > 1, надо вычислять
                 cell['row-span'] = cell.colspan;
             });
         });
@@ -123,7 +138,7 @@ export default class FormLayout extends Vue {
 
     // region CSS Grid Layout for All browsers except IE
     private buildGridTemplate() {
-        this.columns.forEach(column => {
+        this.$children.forEach(column => {
             this.getVisibleCells(column).forEach(cell => {
                 cell.setStyle('grid-column-start', cell['column-start']);
                 cell.setStyle('grid-column-end', cell['column-span']);
@@ -133,20 +148,20 @@ export default class FormLayout extends Vue {
             });
         });
 
-        this.layoutStyle['grid-template-columns'] = this.getGridTemplateColumns();
+        // this.layoutStyle['grid-template-columns'] = this.getGridTemplateColumns();
         this.layoutStyle['grid-template-rows'] = this.getGridTemplateRows();
         this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
         this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
     }
 
-    private getGridTemplateColumns() {
-        return this.columns
-            .reduce((template, child) => {
-                template.push(`${child.colspan}fr`);
-                return template;
-            }, [] as string[])
-            .join(' ');
-    }
+    // private getGridTemplateColumns() {
+    //     return this.columns
+    //         .reduce((template, child) => {
+    //             template.push(`${child.colspan}fr`);
+    //             return template;
+    //         }, [] as string[])
+    //         .join(' ');
+    // }
 
     private getGridTemplateRows() {
         return Array.from({ length: this.getMaxColumnsGridRow() })
@@ -170,7 +185,7 @@ export default class FormLayout extends Vue {
 
     // region CSS Grid Layout For IE
     private buildGridTemplateForIE() {
-        this.columns.forEach(column => {
+        this.$children.forEach(column => {
             this.getVisibleCells(column).forEach(cell => {
                 cell['column-start'] = 2 * cell['column-start'] - 1;
                 cell['column-span'] = 2 * cell['column-span'] - 1;
@@ -190,12 +205,22 @@ export default class FormLayout extends Vue {
 
     private getGridTemplateColumnsForIE() {
         const columnGap = this.$style[`distance-${this.columnGap}`];
-        return this.columns
-            .reduce((template, child) => {
-                template.push(`${child.colspan}fr`);
-                return template;
-            }, [] as string[])
+        return Array.from({ length: this.getMaxCellPerRow() })
+            .fill(this.rowAutoSize ? 'auto' : '1fr')
             .join(` ${columnGap} `);
+    }
+
+    private getMaxCellPerRow() {
+        const maxCellDistanceForChildren = [];
+
+        for (const row of this.rows) {
+            const visibleCells = this.getVisibleCells(row);
+            const lastCell = visibleCells[visibleCells.length - 1];
+            if (!lastCell) continue;
+            else maxCellDistanceForChildren.push(lastCell['column-start'] + lastCell['column-span']);
+        }
+
+        return Math.max(...maxCellDistanceForChildren) / 2;
     }
 
     private getGridTemplateRowsForIE() {
@@ -219,7 +244,7 @@ export default class FormLayout extends Vue {
     }
     // end region
 
-    private getVisibleCells(column: FormLayoutColumn) {
+    private getVisibleCells(column: FormLayoutRow) {
         return column.$children.filter(x => x.isVisible);
     }
 
@@ -238,8 +263,10 @@ export default class FormLayout extends Vue {
 
 <style module lang="scss">
 @import '@/assets/_variables.scss';
+
 .form-layout {
     display: grid;
+    display: -ms-grid;
     align-items: center;
 }
 

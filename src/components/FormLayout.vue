@@ -1,12 +1,25 @@
 <template>
     <div ref="layout" :class="$style['form-layout']" :style="layoutStyle">
-        <slot />
+        <component
+            v-for="(builder, i) in builders"
+            :key="i"
+            :is="builder[0].role === 'column' ? ColumnBuilder : RowBuilder"
+            :cols="builder"
+            :rowsssss="builder"
+            :columnGap="columnGap"
+            :rowGap="rowGap"
+        />
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import FormLayoutColumn from '@/components/FormLayoutColumn.vue';
+import FormLayoutColumnBuilder from '@/components/FormLayoutColumnBuilder.vue';
+import FormLayoutRowBuilder from '@/components/FormLayoutRowBuilder.vue';
+import { VNode } from 'vue';
+
+type ColumnVNode = VNode & { role: 'column' };
+type RowVNode = VNode & { role: 'row' };
 
 @Component
 export default class FormLayout extends Vue {
@@ -16,10 +29,12 @@ export default class FormLayout extends Vue {
     @Prop({ type: Boolean, default: false }) rowAutoSize!: boolean;
     @Prop({ type: Boolean, default: false }) isLoading!: boolean;
 
-    $children!: FormLayoutColumn[];
     $refs!: {
         layout: HTMLDivElement;
     };
+
+    ColumnBuilder = FormLayoutColumnBuilder;
+    RowBuilder = FormLayoutRowBuilder;
 
     private layoutStyle = {
         'grid-template-columns': '',
@@ -29,209 +44,22 @@ export default class FormLayout extends Vue {
         'margin-top': `${this.mt}px`,
     };
 
-    private get columns() {
-        return this.$children.filter(x => x.isVisible);
-    }
+    get builders() {
+        const children = this.$slots.default?.map(child =>
+            Object.assign(child, { role: child.tag?.toLowerCase().includes('column') ? 'column' : 'row' })
+        ) as (ColumnVNode | RowVNode)[];
 
-    private mounted() {
-        this.checkProperUsage();
-        this.subsribeOnColumnsEvents();
-        this.subsribeOnCellsEvents();
-        this.buildLayout();
-    }
+        const result = children?.reduce((builders, child) => {
+            const builder = builders[builders.length - 1];
+            if (builder?.[0].role === child.role) builder?.push(child);
+            if (!builder || builder?.[0].role !== child.role) builders.push([child]);
 
-    private subsribeOnColumnsEvents() {
-        this.$children.forEach(column => {
-            column.$on('is-visible-changed', () => this.buildLayout());
-        });
-    }
+            return builders;
+        }, [] as (ColumnVNode | RowVNode)[][]);
 
-    private subsribeOnCellsEvents() {
-        this.$children.forEach(column => {
-            column.$children.forEach(cell => {
-                cell.$on('is-visible-changed', () => this.buildLayout());
-            });
-        });
-    }
+        console.log(result);
 
-    private buildLayout() {
-        this.calculateCellsPositions();
-        if (!this.$isIE) this.buildGridTemplate();
-        else this.buildGridTemplateForIE();
-    }
-
-    private calculateCellsPositions() {
-        this.columns.forEach((column, columnIndex) => {
-            this.getVisibleCells(column).forEach((cell, cellIndex) => {
-                const aboveGridRowEnd = this.getAboveGridRowEnd(columnIndex, cellIndex);
-                const rowOffset = this.countRowOffset(columnIndex, aboveGridRowEnd);
-
-                cell['column-start'] = columnIndex + 1;
-                cell['column-span'] = cell.rowspan;
-                cell['row-start'] = aboveGridRowEnd + rowOffset;
-                cell['row-span'] = cell.colspan;
-            });
-        });
-    }
-
-    private countRowOffset(columnIndex: number, aboveCellGridRowEnd: number, shift = 0): number {
-        const leftNeighborsSpans = this.columns.reduce(
-            (spans, column, currIndex) => {
-                const leftCell = this.getVisibleCells(column).find(
-                    cell =>
-                        cell['row-start'] <= aboveCellGridRowEnd &&
-                        aboveCellGridRowEnd < cell['row-start'] + cell['row-span']
-                );
-                // Нас интересуют только колонки слева.
-                if (columnIndex <= currIndex) return spans;
-                // Если сумма достигла индекса текущей колонки, то нам нельзя учитывать rowspan
-                // ячейки в текущей колонки, иначе мы посчитаем лишний rowspan.
-                if (currIndex < spans.colspan) return spans;
-                // Возможна ситуация, когда в колонке слева меньше детей, чем в текущей.
-                // В этой ситуации будем считать так, как будто там есть ячейка с rowspan = 1.
-                if (!leftCell) {
-                    spans.colspan += 1;
-                    return spans;
-                }
-
-                spans.colspan += leftCell['column-span'];
-                spans.rowspan = leftCell['row-span'];
-                return spans;
-            },
-            {
-                colspan: 0,
-                rowspan: 1,
-            }
-        );
-
-        const needsToBeShifted = leftNeighborsSpans.colspan > columnIndex;
-        if (needsToBeShifted)
-            return this.countRowOffset(
-                columnIndex,
-                aboveCellGridRowEnd + leftNeighborsSpans.rowspan,
-                shift + leftNeighborsSpans.rowspan
-            );
-        return shift;
-    }
-
-    private getAboveGridRowEnd(columnIndex: number, cellIndex: number): number {
-        if (cellIndex === 0) return 1;
-
-        const aboveCell = this.getVisibleCells(this.columns[columnIndex])[cellIndex - 1];
-        return aboveCell['row-start'] + aboveCell['row-span'];
-    }
-
-    // region CSS Grid Layout for All browsers except IE
-    private buildGridTemplate() {
-        this.columns.forEach(column => {
-            this.getVisibleCells(column).forEach(cell => {
-                cell.setStyle('grid-column-start', cell['column-start']);
-                cell.setStyle('grid-column-end', cell['column-span']);
-                cell.setStyle('grid-row-start', cell['row-start']);
-                cell.setStyle('grid-row-end', cell['row-span']);
-                cell.setStyle('align-self', cell.align);
-            });
-        });
-
-        this.layoutStyle['grid-template-columns'] = this.getGridTemplateColumns();
-        this.layoutStyle['grid-template-rows'] = this.getGridTemplateRows();
-        this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
-        this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
-    }
-
-    private getGridTemplateColumns() {
-        return this.columns
-            .reduce((template, child) => {
-                template.push(`${child.colspan}fr`);
-                return template;
-            }, [] as string[])
-            .join(' ');
-    }
-
-    private getGridTemplateRows() {
-        return Array.from({ length: this.getMaxColumnsGridRow() })
-            .fill(this.rowAutoSize ? 'auto' : '1fr')
-            .join(' ');
-    }
-
-    private getMaxColumnsGridRow() {
-        const columnsChildrenMaxGridRows = [];
-
-        for (const column of this.columns) {
-            const visibleCells = this.getVisibleCells(column);
-            const lastCell = visibleCells[visibleCells.length - 1];
-            if (!lastCell) continue;
-            else columnsChildrenMaxGridRows.push(lastCell['row-start'] + lastCell['row-span'] - 1);
-        }
-
-        return Math.max(...columnsChildrenMaxGridRows);
-    }
-    // end region
-
-    // region CSS Grid Layout For IE
-    private buildGridTemplateForIE() {
-        this.columns.forEach(column => {
-            this.getVisibleCells(column).forEach(cell => {
-                cell['column-start'] = 2 * cell['column-start'] - 1;
-                cell['column-span'] = 2 * cell['column-span'] - 1;
-                cell['row-start'] = 2 * cell['row-start'] - 1;
-                cell['row-span'] = 2 * cell['row-span'] - 1;
-
-                cell.setStyle('-ms-grid-column', cell['column-start']);
-                cell.setStyle('-ms-grid-column-span', cell['column-span']);
-                cell.setStyle('-ms-grid-row', cell['row-start']);
-                cell.setStyle('-ms-grid-row-span', cell['row-span']);
-            });
-        });
-
-        this.$refs.layout.style.setProperty('-ms-grid-columns', this.getGridTemplateColumnsForIE());
-        this.$refs.layout.style.setProperty('-ms-grid-rows', this.getGridTemplateRowsForIE());
-    }
-
-    private getGridTemplateColumnsForIE() {
-        const columnGap = this.$style[`distance-${this.columnGap}`];
-        return this.columns
-            .reduce((template, child) => {
-                template.push(`${child.colspan}fr`);
-                return template;
-            }, [] as string[])
-            .join(` ${columnGap} `);
-    }
-
-    private getGridTemplateRowsForIE() {
-        const rowGap = this.$style[`distance-${this.rowGap}`];
-        return Array.from({ length: this.getMaxColumnsGridRowForIE() / 2 })
-            .fill(this.rowAutoSize ? 'auto' : '1fr')
-            .join(` ${rowGap} `);
-    }
-
-    private getMaxColumnsGridRowForIE() {
-        const columnsChildrenMaxGridRows = [];
-
-        for (const column of this.columns) {
-            const visibleCells = this.getVisibleCells(column);
-            const lastCell = visibleCells[visibleCells.length - 1];
-            if (!lastCell) continue;
-            else columnsChildrenMaxGridRows.push(lastCell['row-start'] + lastCell['row-span']);
-        }
-
-        return Math.max(...columnsChildrenMaxGridRows);
-    }
-    // end region
-
-    private getVisibleCells(column: FormLayoutColumn) {
-        return column.$children.filter(x => x.isVisible);
-    }
-
-    private checkProperUsage() {
-        let isUsageError = false;
-
-        this.$children.forEach(x => {
-            if (x.$vnode.componentOptions?.tag !== 'v-form-layout-column') isUsageError = true;
-        });
-
-        // if (isUsageError)
-        //     log.dev.error(__filename, 'Дочерними элементами v-form-layout могут быть только v-form-layout-column');
+        return result;
     }
 }
 </script>

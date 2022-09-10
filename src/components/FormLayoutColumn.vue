@@ -15,6 +15,8 @@ export default class FormLayoutColumn extends Vue {
 
     $children!: FormLayoutCell[];
 
+    role = 'column';
+
     @Watch('isVisible')
     onIsVisible() {
         this.$emit('is-visible-changed');

@@ -1,231 +1,25 @@
 <template>
     <div id="app">
-        <FormLayout>
-            <!-- <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="1" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="2" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="3" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="4" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="1" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="2" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="3" />
-                </FormLayoutCell>
-            </FormLayoutRow>
-
-            <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-            </FormLayoutRow>
-
-            <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="9" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="10" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="11" />
-                </FormLayoutCell>
-            </FormLayoutRow> -->
-
-            <FormLayoutColumn :colspan="2">
-                <FormLayoutCell>
-                    <PlaceHolder text="1" />
-                </FormLayoutCell>
-
-                <FormLayoutCell :colspan="2" :rowspan="3">
-                    <PlaceHolder :colspan="2" text="2" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="3" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="4" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell />
-
-                <FormLayoutCell :rowspan="2">
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-
-                <FormLayoutCell :rowspan="2">
-                    <PlaceHolder text="8" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <FormLayoutColumn>
-                <FormLayoutCell>
-                    <PlaceHolder text="9" />
-                </FormLayoutCell>
-
-                <FormLayoutCell />
-
-                <FormLayoutCell>
-                    <PlaceHolder text="10" />
-                </FormLayoutCell>
-            </FormLayoutColumn>
-
-            <!-- <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="1" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="2" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="3" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="4" />
-                </FormLayoutCell>
-            </FormLayoutRow>
-
-            <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="5" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="6" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="7" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="8" />
-                </FormLayoutCell>
-            </FormLayoutRow>
-
-            <FormLayoutRow>
-                <FormLayoutCell>
-                    <PlaceHolder text="9" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="10" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="11" />
-                </FormLayoutCell>
-
-                <FormLayoutCell>
-                    <PlaceHolder text="12" />
-                </FormLayoutCell>
-            </FormLayoutRow> -->
-        </FormLayout>
+        <Grid1 class="grid" />
+        <Grid2 class="grid" />
+        <Grid3 class="grid" />
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-@Component
+import Grid1 from '@/Grid1.vue';
+import Grid2 from '@/Grid2.vue';
+import Grid3 from '@/Grid3.vue';
+
+@Component({
+    components: {
+        Grid1,
+        Grid2,
+        Grid3,
+    },
+})
 export default class App extends Vue {}
 </script>
 
@@ -252,10 +46,17 @@ input {
     color: #2c3e50;
     margin-top: 60px;
 
-    width: 60%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
     padding: 10px;
-    border: 2px solid black;
+
+    display: inline-grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: flex-start;
+    gap: 24px;
+
+    .grid {
+        padding: 10px;
+        border: 2px solid black;
+    }
 }
 </style>

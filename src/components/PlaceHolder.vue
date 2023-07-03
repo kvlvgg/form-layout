@@ -1,6 +1,6 @@
 <template>
     <div :style="placeholderStyle" :class="$style.filler">
-        {{ text }}
+        {{ rowOrColumnText + ' ' + text }}
     </div>
 </template>
 
@@ -15,17 +15,22 @@ export default class Placeholder extends Vue {
     @Prop({ type: Number, default: 1 }) colspan!: number;
 
     get layout() {
-        return this.$parent.$parent.$parent as FormLayout;
+        return this.$parent?.$parent?.$parent as FormLayout;
     }
 
     get rowDistance() {
         return this.$style[`distance-${this.layout.rowGap}`];
     }
 
+    get rowOrColumnText() {
+        return this.$parent?.$parent.role.slice(0, 3);
+    }
+
     get placeholderStyle() {
         return {
             height: `calc(${this.$style[`height`]} * ${this.colspan} + ${this.rowDistance} * ${this.colspan - 1})`,
-            'background-color': `#${Math.floor(Math.random() * 1_000_000)}`,
+            // 'background-color': `#${Math.floor(Math.random() * 1_000_000)}`,
+            'background-color': `#777777`,
             display: 'flex',
             'justify-content': 'center',
             'align-items': 'center',

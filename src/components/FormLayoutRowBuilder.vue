@@ -1,26 +1,33 @@
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import FormLayoutRow from '@/components/FormLayoutRow.vue';
 import { CreateElement, VNode } from 'vue';
 
 @Component
-export default class FormLayout extends Vue {
+export default class FormLayoutRowBuilder extends Vue {
     @Prop({ type: String, default: '0' }) mt!: string;
     @Prop({ type: String, default: 'lg' }) columnGap!: 'x2s' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     @Prop({ type: String, default: 'x2s' }) rowGap!: 'x2s' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     @Prop({ type: Boolean, default: false }) rowAutoSize!: boolean;
     @Prop({ type: Boolean, default: false }) isLoading!: boolean;
 
-    @Prop({ type: Array, default: () => [] }) rowsssss!: VNode[];
+    @Prop({ type: Array, default: () => [] }) items!: VNode[];
+    @Prop({ type: Number, default: 0 }) rowStart!: number;
+    @Prop({ type: Number, default: 0 }) rowEnd!: number;
 
     render(h: CreateElement) {
-        return h('div', { ref: 'layout', class: this.$style['form-layout'], style: this.layoutStyle }, [this.rowsssss]);
+        return h('fragment', [this.items]);
     }
 
     $children!: FormLayoutRow[];
     $refs!: {
         layout: HTMLDivElement;
     };
+
+    @Watch('rowStart')
+    onRowStart() {
+        this.buildLayout();
+    }
 
     private layoutStyle = {
         'grid-template-columns': '',
@@ -29,10 +36,6 @@ export default class FormLayout extends Vue {
         'row-gap': '',
         'margin-top': `${this.mt}px`,
     };
-
-    private get columns() {
-        return this.$children.filter(x => x.isVisible && x.role === 'column');
-    }
 
     private get rows() {
         return this.$children.filter(x => x.isVisible && x.role === 'row');
@@ -60,80 +63,70 @@ export default class FormLayout extends Vue {
     }
 
     private buildLayout() {
-        console.log('this.$isIE', this.$isIE);
         this.calculateCellsPositions();
         if (!this.$isIE) this.buildGridTemplate();
         else this.buildGridTemplateForIE();
     }
 
     private calculateCellsPositions() {
-        this.columns.forEach((column, columnIndex) => {
-            this.getVisibleCells(column).forEach((cell, cellIndex) => {
-                const aboveGridRowEnd = this.getAboveGridRowEnd(columnIndex, cellIndex);
-                const rowOffset = this.countRowOffset(columnIndex, aboveGridRowEnd);
-
-                cell['column-start'] = columnIndex + 1;
-                cell['column-span'] = cell.rowspan;
-                cell['row-start'] = aboveGridRowEnd + rowOffset;
-                cell['row-span'] = cell.colspan;
-            });
-        });
-
         this.rows.forEach((row, rowIndex) => {
             this.getVisibleCells(row).forEach((cell, cellIndex) => {
-                cell['column-start'] = cellIndex + 1; // если cell.rowspan > 1, надо вычислять
+                const leftGridColumnEnd = this.getLeftGridColumnEnd(rowIndex, cellIndex);
+                const columnOffset = this.countColumnOffset(rowIndex, leftGridColumnEnd);
+
+                cell['column-start'] = leftGridColumnEnd + columnOffset; // если cell.rowspan > 1, надо вычислять
                 cell['column-span'] = cell.rowspan;
-                cell['row-start'] = rowIndex + 1; // если cell.colspan > 1, надо вычислять
+                cell['row-start'] = rowIndex + 1 + this.rowStart;
                 cell['row-span'] = cell.colspan;
             });
         });
     }
 
-    private countRowOffset(columnIndex: number, aboveCellGridRowEnd: number, shift = 0): number {
-        const leftNeighborsSpans = this.columns.reduce(
-            (spans, column, currIndex) => {
-                const leftCell = this.getVisibleCells(column).find(
+    private countColumnOffset(rowIndex: number, leftGridColumnEnd: number, shift = 0): number {
+        const leftNeighborsSpans = this.rows.reduce(
+            (spans, row, currIndex) => {
+                const aboveCell = this.getVisibleCells(row).find(
                     cell =>
-                        cell['row-start'] <= aboveCellGridRowEnd &&
-                        aboveCellGridRowEnd < cell['row-start'] + cell['row-span']
+                        cell['column-start'] <= leftGridColumnEnd &&
+                        leftGridColumnEnd < cell['column-start'] + cell['column-span']
                 );
-                // Нас интересуют только колонки слева.
-                if (columnIndex <= currIndex) return spans;
-                // Если сумма достигла индекса текущей колонки, то нам нельзя учитывать rowspan
+                // Нас интересуют только колонки сверху.
+                if (rowIndex <= currIndex) return spans;
+                // Если сумма достигла индекса текущей строки, то нам нельзя учитывать colspan
                 // ячейки в текущей колонки, иначе мы посчитаем лишний rowspan.
-                if (currIndex < spans.colspan) return spans;
-                // Возможна ситуация, когда в колонке слева меньше детей, чем в текущей.
-                // В этой ситуации будем считать так, как будто там есть ячейка с rowspan = 1.
-                if (!leftCell) {
-                    spans.colspan += 1;
+                if (currIndex < spans.rowspan) return spans;
+                // Возможна ситуация, когда в колонке сверзу меньше детей, чем в текущей.
+                // В этой ситуации будем считать так, как будто там есть ячейка с colspan = 1.
+                if (!aboveCell) {
+                    spans.rowspan += 1;
                     return spans;
                 }
 
-                spans.colspan += leftCell['column-span'];
-                spans.rowspan = leftCell['row-span'];
+                spans.colspan = aboveCell['column-span'];
+                spans.rowspan += aboveCell['row-span'];
                 return spans;
             },
             {
-                colspan: 0,
-                rowspan: 1,
+                colspan: 1,
+                rowspan: 0,
             }
         );
 
-        const needsToBeShifted = leftNeighborsSpans.colspan > columnIndex;
+        const needsToBeShifted = leftNeighborsSpans.rowspan > rowIndex;
         if (needsToBeShifted)
-            return this.countRowOffset(
-                columnIndex,
-                aboveCellGridRowEnd + leftNeighborsSpans.rowspan,
-                shift + leftNeighborsSpans.rowspan
+            return this.countColumnOffset(
+                rowIndex,
+                leftGridColumnEnd + leftNeighborsSpans.colspan,
+                shift + leftNeighborsSpans.colspan
             );
         return shift;
     }
 
-    private getAboveGridRowEnd(columnIndex: number, cellIndex: number): number {
+    private getLeftGridColumnEnd(rowIndex: number, cellIndex: number): number {
         if (cellIndex === 0) return 1;
 
-        const aboveCell = this.getVisibleCells(this.columns[columnIndex])[cellIndex - 1];
-        return aboveCell['row-start'] + aboveCell['row-span'];
+        const leftCell = this.getVisibleCells(this.rows[rowIndex])[cellIndex - 1];
+        return leftCell['column-start'] + leftCell['column-span'];
     }
 
     // region CSS Grid Layout for All browsers except IE
@@ -152,16 +145,9 @@ export default class FormLayout extends Vue {
         this.layoutStyle['grid-template-rows'] = this.getGridTemplateRows();
         this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
         this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
-    }
 
-    // private getGridTemplateColumns() {
-    //     return this.columns
-    //         .reduce((template, child) => {
-    //             template.push(`${child.colspan}fr`);
-    //             return template;
-    //         }, [] as string[])
-    //         .join(' ');
-    // }
+        this.$emit('update:rowEnd', this.getMaxColumnsGridRow());
+    }
 
     private getGridTemplateRows() {
         return Array.from({ length: this.getMaxColumnsGridRow() })
@@ -172,11 +158,8 @@ export default class FormLayout extends Vue {
     private getMaxColumnsGridRow() {
         const columnsChildrenMaxGridRows = [];
 
-        for (const column of this.columns) {
-            const visibleCells = this.getVisibleCells(column);
-            const lastCell = visibleCells[visibleCells.length - 1];
-            if (!lastCell) continue;
-            else columnsChildrenMaxGridRows.push(lastCell['row-start'] + lastCell['row-span'] - 1);
+        for (const cell of this.getVisibleCells(this.rows[this.rows.length - 1])) {
+            columnsChildrenMaxGridRows.push(cell['row-start'] + cell['row-span'] - 1);
         }
 
         return Math.max(...columnsChildrenMaxGridRows);

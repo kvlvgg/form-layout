@@ -1,12 +1,7 @@
-<template>
-    <fragment>
-        <slot />
-    </fragment>
-</template>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import FormLayoutCell from '@/components/FormLayoutCell.vue';
+import { CreateElement } from 'vue';
 
 @Component
 export default class FormLayoutRow extends Vue {
@@ -35,6 +30,10 @@ export default class FormLayoutRow extends Vue {
     @Watch('isVisible')
     onIsVisible() {
         this.$emit('is-visible-changed');
+    }
+
+    render(h: CreateElement) {
+        return h('fragment', this.$slots.default);
     }
 }
 </script>

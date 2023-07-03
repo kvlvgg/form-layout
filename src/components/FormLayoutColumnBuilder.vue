@@ -1,26 +1,34 @@
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import FormLayoutColumn from '@/components/FormLayoutColumn.vue';
 import { CreateElement, VNode } from 'vue';
 
 @Component
-export default class FormLayout extends Vue {
+export default class FormLayoutColumnBuilder extends Vue {
     @Prop({ type: String, default: '0' }) mt!: string;
     @Prop({ type: String, default: 'lg' }) columnGap!: 'x2s' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     @Prop({ type: String, default: 'x2s' }) rowGap!: 'x2s' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     @Prop({ type: Boolean, default: false }) rowAutoSize!: boolean;
     @Prop({ type: Boolean, default: false }) isLoading!: boolean;
 
-    @Prop({ type: Array, default: () => [] }) cols!: VNode[];
+    @Prop({ type: Array, default: () => [] }) items!: VNode[];
+    @Prop({ type: Number, default: 0 }) rowStart!: number;
+    @Prop({ type: Number, default: 0 }) rowEnd!: number;
 
     render(h: CreateElement) {
-        return h('div', { ref: 'layout', class: this.$style['form-layout'], style: this.layoutStyle }, [this.cols]);
+        return h('fragment', [this.items]);
     }
 
     $children!: FormLayoutColumn[];
     $refs!: {
         layout: HTMLDivElement;
     };
+
+    @Watch('rowStart')
+    onRowStart() {
+        console.log('onRowStart');
+        this.buildLayout();
+    }
 
     private layoutStyle = {
         'grid-template-columns': '',
@@ -32,10 +40,6 @@ export default class FormLayout extends Vue {
 
     private get columns() {
         return this.$children.filter(x => x.isVisible && x.role === 'column');
-    }
-
-    private get rows() {
-        return this.$children.filter(x => x.isVisible && x.role === 'row');
     }
 
     private mounted() {
@@ -60,7 +64,6 @@ export default class FormLayout extends Vue {
     }
 
     private buildLayout() {
-        console.log('this.$isIE', this.$isIE);
         this.calculateCellsPositions();
         if (!this.$isIE) this.buildGridTemplate();
         else this.buildGridTemplateForIE();
@@ -74,16 +77,7 @@ export default class FormLayout extends Vue {
 
                 cell['column-start'] = columnIndex + 1;
                 cell['column-span'] = cell.rowspan;
-                cell['row-start'] = aboveGridRowEnd + rowOffset;
-                cell['row-span'] = cell.colspan;
-            });
-        });
-
-        this.rows.forEach((row, rowIndex) => {
-            this.getVisibleCells(row).forEach((cell, cellIndex) => {
-                cell['column-start'] = cellIndex + 1; // если cell.rowspan > 1, надо вычислять
-                cell['column-span'] = cell.rowspan;
-                cell['row-start'] = rowIndex + 1; // если cell.colspan > 1, надо вычислять
+                cell['row-start'] = aboveGridRowEnd + rowOffset + this.rowStart;
                 cell['row-span'] = cell.colspan;
             });
         });
@@ -152,6 +146,8 @@ export default class FormLayout extends Vue {
         this.layoutStyle['grid-template-rows'] = this.getGridTemplateRows();
         this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
         this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
+
+        this.$emit('update:rowEnd', this.getMaxColumnsGridRow());
     }
 
     private getGridTemplateColumns() {
@@ -211,19 +207,6 @@ export default class FormLayout extends Vue {
                 return template;
             }, [] as string[])
             .join(` ${columnGap} `);
-    }
-
-    private getMaxCellPerRow() {
-        const cellCountForChildren = [this.columns.reduce((count, col) => count + col.colspan, 0)];
-
-        for (const row of this.rows) {
-            const visibleCells = this.getVisibleCells(row);
-            const lastCell = visibleCells[visibleCells.length - 1];
-            if (!lastCell) continue;
-            else cellCountForChildren.push(lastCell['column-start'] + lastCell['column-span']);
-        }
-
-        return Math.max(...cellCountForChildren);
     }
 
     private getGridTemplateRowsForIE() {

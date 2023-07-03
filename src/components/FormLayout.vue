@@ -3,11 +3,13 @@
         <component
             v-for="(builder, i) in builders"
             :key="i"
-            :is="builder[0].role === 'column' ? ColumnBuilder : RowBuilder"
-            :cols="builder"
-            :rowsssss="builder"
+            :is="builderComponents[builder.type]"
+            :items="builder.items"
+            :rowStart="i === 0 ? 0 : builders[i - 1].rowEnd"
+            :rowEnd.sync="builder.rowEnd"
             :columnGap="columnGap"
             :rowGap="rowGap"
+            @update:rowEnd="test"
         />
     </div>
 </template>
@@ -20,6 +22,7 @@ import { VNode } from 'vue';
 
 type ColumnVNode = VNode & { role: 'column' };
 type RowVNode = VNode & { role: 'row' };
+type Builder = { type: 'column' | 'row'; rowEnd: number; items: (ColumnVNode | RowVNode)[] };
 
 @Component
 export default class FormLayout extends Vue {
@@ -29,14 +32,20 @@ export default class FormLayout extends Vue {
     @Prop({ type: Boolean, default: false }) rowAutoSize!: boolean;
     @Prop({ type: Boolean, default: false }) isLoading!: boolean;
 
+    test() {
+        console.log('updated', this.builders);
+    }
+
     $refs!: {
         layout: HTMLDivElement;
     };
 
-    ColumnBuilder = FormLayoutColumnBuilder;
-    RowBuilder = FormLayoutRowBuilder;
+    builderComponents = {
+        column: FormLayoutColumnBuilder,
+        row: FormLayoutRowBuilder,
+    };
 
-    private layoutStyle = {
+    layoutStyle = {
         'grid-template-columns': '',
         'grid-template-rows': '',
         'column-gap': '',
@@ -44,22 +53,24 @@ export default class FormLayout extends Vue {
         'margin-top': `${this.mt}px`,
     };
 
-    get builders() {
+    builders: Builder[] = [];
+
+    mounted() {
         const children = this.$slots.default?.map(child =>
             Object.assign(child, { role: child.tag?.toLowerCase().includes('column') ? 'column' : 'row' })
         ) as (ColumnVNode | RowVNode)[];
 
-        const result = children?.reduce((builders, child) => {
+        this.builders = children?.reduce((builders, child) => {
             const builder = builders[builders.length - 1];
-            if (builder?.[0].role === child.role) builder?.push(child);
-            if (!builder || builder?.[0].role !== child.role) builders.push([child]);
+            if (builder?.type === child.role) builder.items.push(child);
+            if (!builder || builder.type !== child.role) builders.push({ type: child.role, rowEnd: 0, items: [child] });
 
             return builders;
-        }, [] as (ColumnVNode | RowVNode)[][]);
+        }, [] as Builder[]);
 
-        console.log(result);
-
-        return result;
+        this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
+        this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
+        this.layoutStyle['margin-top'] = `${this.mt}px`;
     }
 }
 </script>

@@ -13,10 +13,11 @@ export default class FormLayoutCell extends Vue {
     @Prop({ type: Boolean, default: true }) isVisible!: boolean;
     @Prop({ type: Number, default: 1 }) colspan!: number;
     @Prop({ type: Number, default: 1 }) rowspan!: number;
+    @Prop({ type: String, default: 'auto' }) align!: string;
 
     $parent!: FormLayoutColumn;
 
-    private get isParentVisible() {
+    get isParentVisible() {
         return this.$parent.isVisible;
     }
 
@@ -29,7 +30,7 @@ export default class FormLayoutCell extends Vue {
     public 'row-start' = 0;
     public 'row-span' = 0;
 
-    public setStyle(styleProperty: string, value: number) {
+    public setStyle(styleProperty: string, value: number | string) {
         let keyword = '';
         if (styleProperty === 'grid-column-end' || styleProperty === 'grid-row-end') {
             keyword = ' span';

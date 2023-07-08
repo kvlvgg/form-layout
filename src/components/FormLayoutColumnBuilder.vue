@@ -77,7 +77,7 @@ export default class FormLayoutColumnBuilder extends Vue {
 
                 cell['column-start'] = columnIndex + 1;
                 cell['column-span'] = cell.rowspan;
-                cell['row-start'] = aboveGridRowEnd + rowOffset + this.rowStart;
+                cell['row-start'] = aboveGridRowEnd + rowOffset;
                 cell['row-span'] = cell.colspan;
             });
         });
@@ -124,7 +124,7 @@ export default class FormLayoutColumnBuilder extends Vue {
     }
 
     private getAboveGridRowEnd(columnIndex: number, cellIndex: number): number {
-        if (cellIndex === 0) return 1;
+        if (cellIndex === 0) return this.rowStart + 1;
 
         const aboveCell = this.getVisibleCells(this.columns[columnIndex])[cellIndex - 1];
         return aboveCell['row-start'] + aboveCell['row-span'];

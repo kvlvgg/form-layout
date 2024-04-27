@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import FormLayout from '@/components/FormLayout.vue';
+import FormLayout from '@/components/layout/v-form-layout.vue';
 
 // Компонент для демонстрации шаблона
 @Component

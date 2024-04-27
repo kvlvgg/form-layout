@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import FormLayoutRow from '@/components/FormLayoutRow.vue';
+import FormLayoutRow from '@/components/layout/v-form-layout-row.vue';
 import { CreateElement, VNode } from 'vue';
 
 @Component
@@ -16,7 +16,7 @@ export default class FormLayoutRowBuilder extends Vue {
     @Prop({ type: Number, default: 0 }) rowEnd!: number;
 
     render(h: CreateElement) {
-        return h('fragment', [this.items]);
+        return h('fragment', this.$slots.default);
     }
 
     $children!: FormLayoutRow[];
@@ -42,7 +42,6 @@ export default class FormLayoutRowBuilder extends Vue {
     }
 
     private mounted() {
-        this.checkProperUsage();
         this.subsribeOnColumnsEvents();
         this.subsribeOnCellsEvents();
         this.buildLayout();
@@ -147,10 +146,28 @@ export default class FormLayoutRowBuilder extends Vue {
         this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
 
         this.$emit('update:rowEnd', this.getMaxColumnsGridRow());
+        this.$emit('update:gridTemplateColumns', this.getGridTemplateColumns());
+        this.$emit('update:gridTemplateRows', this.getGridTemplateRows());
+    }
+
+    private getGridTemplateColumns() {
+        const [longestRow] = this.rows.sort((a, b) => {
+            const [lastCellA] = this.getVisibleCells(a).reverse();
+            const [lastCellB] = this.getVisibleCells(b).reverse();
+            const lastCellALength = lastCellA['column-start'] - lastCellA['column-span'];
+            const lastCellBLength = lastCellB['column-start'] - lastCellB['column-span'];
+
+            return lastCellBLength - lastCellALength;
+        });
+
+        const [lastCell] = this.getVisibleCells(longestRow).reverse();
+        const lastCellLength = lastCell['column-start'] + lastCell['column-span'] - 1;
+
+        return Array.from({ length: lastCellLength }).fill('1fr').join(' ');
     }
 
     private getGridTemplateRows() {
-        return Array.from({ length: this.getMaxColumnsGridRow() })
+        return Array.from({ length: this.getMaxColumnsGridRow() - this.rowStart })
             .fill(this.rowAutoSize ? 'auto' : '1fr')
             .join(' ');
     }
@@ -216,7 +233,7 @@ export default class FormLayoutRowBuilder extends Vue {
     private getMaxColumnsGridRowForIE() {
         const columnsChildrenMaxGridRows = [];
 
-        for (const column of this.columns) {
+        for (const column of this.rows) {
             const visibleCells = this.getVisibleCells(column);
             const lastCell = visibleCells[visibleCells.length - 1];
             if (!lastCell) continue;
@@ -229,17 +246,6 @@ export default class FormLayoutRowBuilder extends Vue {
 
     private getVisibleCells(column: FormLayoutRow) {
         return column.$children.filter(x => x.isVisible);
-    }
-
-    private checkProperUsage() {
-        let isUsageError = false;
-
-        this.$children.forEach(x => {
-            if (x.$vnode.componentOptions?.tag !== 'v-form-layout-column') isUsageError = true;
-        });
-
-        // if (isUsageError)
-        //     log.dev.error(__filename, 'Дочерними элементами v-form-layout могут быть только v-form-layout-column');
     }
 }
 </script>

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import FormLayoutColumn from '@/components/FormLayoutColumn.vue';
+import FormLayoutColumn from '@/components/layout/v-form-layout-column.vue';
 import { CreateElement, VNode } from 'vue';
 
 @Component
@@ -16,17 +16,16 @@ export default class FormLayoutColumnBuilder extends Vue {
     @Prop({ type: Number, default: 0 }) rowEnd!: number;
 
     render(h: CreateElement) {
-        return h('fragment', [this.items]);
+        return h('fragment', this.$slots.default);
     }
 
     $children!: FormLayoutColumn[];
-    $refs!: {
+    override $refs!: {
         layout: HTMLDivElement;
     };
 
     @Watch('rowStart')
     onRowStart() {
-        console.log('onRowStart');
         this.buildLayout();
     }
 
@@ -43,7 +42,6 @@ export default class FormLayoutColumnBuilder extends Vue {
     }
 
     private mounted() {
-        this.checkProperUsage();
         this.subsribeOnColumnsEvents();
         this.subsribeOnCellsEvents();
         this.buildLayout();
@@ -147,6 +145,8 @@ export default class FormLayoutColumnBuilder extends Vue {
         this.layoutStyle['column-gap'] = this.$style[`distance-${this.columnGap}`];
         this.layoutStyle['row-gap'] = this.$style[`distance-${this.rowGap}`];
 
+        this.$emit('update:gridTemplateColumns', this.getGridTemplateColumns());
+        this.$emit('update:gridTemplateRows', this.getGridTemplateRows());
         this.$emit('update:rowEnd', this.getMaxColumnsGridRow());
     }
 
@@ -160,7 +160,7 @@ export default class FormLayoutColumnBuilder extends Vue {
     }
 
     private getGridTemplateRows() {
-        return Array.from({ length: this.getMaxColumnsGridRow() })
+        return Array.from({ length: this.getMaxColumnsGridRow() - this.rowStart })
             .fill(this.rowAutoSize ? 'auto' : '1fr')
             .join(' ');
     }
@@ -232,17 +232,6 @@ export default class FormLayoutColumnBuilder extends Vue {
 
     private getVisibleCells(column: FormLayoutColumn) {
         return column.$children.filter(x => x.isVisible);
-    }
-
-    private checkProperUsage() {
-        let isUsageError = false;
-
-        this.$children.forEach(x => {
-            if (x.$vnode.componentOptions?.tag !== 'v-form-layout-column') isUsageError = true;
-        });
-
-        // if (isUsageError)
-        //     log.dev.error(__filename, 'Дочерними элементами v-form-layout могут быть только v-form-layout-column');
     }
 }
 </script>

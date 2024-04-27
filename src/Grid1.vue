@@ -1,147 +1,147 @@
 <template>
-    <FormLayout>
-        <FormLayoutColumn :colspan="2">
-            <FormLayoutCell>
+    <v-form-layout>
+        <v-form-layout-column :colspan="2">
+            <v-form-layout-cell>
                 <PlaceHolder text="1" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell :colspan="2" :rowspan="3">
+            <v-form-layout-cell :colspan="2" :rowspan="3">
                 <PlaceHolder :colspan="2" text="2" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="3" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="4" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell />
+            <v-form-layout-cell />
 
-            <FormLayoutCell :rowspan="2">
+            <v-form-layout-cell :rowspan="2">
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell :rowspan="2">
+            <v-form-layout-cell :rowspan="2">
                 <PlaceHolder text="8" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="9" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell />
+            <v-form-layout-cell />
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="10" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutRow>
-            <FormLayoutCell>
+        <v-form-layout-row>
+            <v-form-layout-cell>
                 <PlaceHolder text="1" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell :colspan="2">
+            <v-form-layout-cell :colspan="2">
                 <PlaceHolder :colspan="2" text="2" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="3" />
-            </FormLayoutCell>
-        </FormLayoutRow>
+            </v-form-layout-cell>
+        </v-form-layout-row>
 
-        <FormLayoutRow>
-            <FormLayoutCell :colspan="2">
+        <v-form-layout-row>
+            <v-form-layout-cell :colspan="2">
                 <PlaceHolder :colspan="2" text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
-        </FormLayoutRow>
+            </v-form-layout-cell>
+        </v-form-layout-row>
 
-        <FormLayoutRow>
-            <FormLayoutCell :rowspan="2">
+        <v-form-layout-row>
+            <v-form-layout-cell :rowspan="2">
                 <PlaceHolder text="9" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <!-- <FormLayoutCell>
+            <!-- <v-form-layout-cell>
                 <PlaceHolder text="10" />
-            </FormLayoutCell> -->
+            </v-form-layout-cell> -->
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="11" />
-            </FormLayoutCell>
-        </FormLayoutRow>
+            </v-form-layout-cell>
+        </v-form-layout-row>
 
-        <FormLayoutColumn :colspan="2">
-            <FormLayoutCell>
+        <v-form-layout-column :colspan="2">
+            <v-form-layout-cell>
                 <PlaceHolder text="1" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell :colspan="2" :rowspan="3">
+            <v-form-layout-cell :colspan="2" :rowspan="3">
                 <PlaceHolder :colspan="2" text="2" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="3" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="4" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell />
+            <v-form-layout-cell />
 
-            <FormLayoutCell :rowspan="2">
+            <v-form-layout-cell :rowspan="2">
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell :rowspan="2">
+            <v-form-layout-cell :rowspan="2">
                 <PlaceHolder text="8" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="9" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell />
+            <v-form-layout-cell />
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="10" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
-    </FormLayout>
+            </v-form-layout-cell>
+        </v-form-layout-column>
+    </v-form-layout>
 </template>
 
 <script lang="ts">

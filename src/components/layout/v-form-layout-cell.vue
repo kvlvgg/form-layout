@@ -6,7 +6,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import FormLayoutColumn from '@/components/FormLayoutColumn.vue';
+import FormLayoutColumn from '@/components/layout/v-form-layout-column.vue';
+import FormLayoutRow from '@/components/layout/v-form-layout-row.vue';
 
 @Component
 export default class FormLayoutCell extends Vue {
@@ -15,13 +16,13 @@ export default class FormLayoutCell extends Vue {
     @Prop({ type: Number, default: 1 }) rowspan!: number;
     @Prop({ type: String, default: 'auto' }) align!: string;
 
-    $parent!: FormLayoutColumn;
+    $parent!: FormLayoutColumn | FormLayoutRow;
 
     get isParentVisible() {
         return this.$parent.isVisible;
     }
 
-    $refs!: {
+    override $refs!: {
         'layout-cell': HTMLDivElement;
     };
 
@@ -30,7 +31,7 @@ export default class FormLayoutCell extends Vue {
     public 'row-start' = 0;
     public 'row-span' = 0;
 
-    public setStyle(styleProperty: string, value: number | string) {
+    public setStyle(styleProperty: string, value: string | number) {
         let keyword = '';
         if (styleProperty === 'grid-column-end' || styleProperty === 'grid-row-end') {
             keyword = ' span';

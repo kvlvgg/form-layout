@@ -1,119 +1,119 @@
 <template>
-    <FormLayout>
-        <FormLayoutColumn>
-            <FormLayoutCell>
+    <v-form-layout>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="1" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="2" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="3" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="4" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutColumn>
-            <FormLayoutCell>
+        <v-form-layout-column>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
-        </FormLayoutColumn>
+            </v-form-layout-cell>
+        </v-form-layout-column>
 
-        <FormLayoutRow>
-            <FormLayoutCell>
+        <v-form-layout-row>
+            <v-form-layout-cell>
                 <PlaceHolder text="1" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="2" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="3" />
-            </FormLayoutCell>
-        </FormLayoutRow>
+            </v-form-layout-cell>
+        </v-form-layout-row>
 
-        <FormLayoutRow>
-            <FormLayoutCell>
+        <v-form-layout-row>
+            <v-form-layout-cell>
                 <PlaceHolder text="5" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="6" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="7" />
-            </FormLayoutCell>
-        </FormLayoutRow>
+            </v-form-layout-cell>
+        </v-form-layout-row>
 
-        <FormLayoutRow>
-            <FormLayoutCell>
+        <v-form-layout-row>
+            <v-form-layout-cell>
                 <PlaceHolder text="9" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="10" />
-            </FormLayoutCell>
+            </v-form-layout-cell>
 
-            <FormLayoutCell>
+            <v-form-layout-cell>
                 <PlaceHolder text="11" />
-            </FormLayoutCell>
-        </FormLayoutRow>
-    </FormLayout>
+            </v-form-layout-cell>
+        </v-form-layout-row>
+    </v-form-layout>
 </template>
 
 <script lang="ts">

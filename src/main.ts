@@ -9,7 +9,7 @@ Vue.use(Fragment.Plugin);
 /*
  * Autoimport components, name = filename - .vue
  */
-const requireComponent = require.context('./components', false, /\.(vue|ts)$/);
+const requireComponent = require.context('./components', true, /\.(vue|ts)$/);
 requireComponent.keys().forEach((fileName: string) => {
     const componentConfig = requireComponent(fileName);
     const componentName = (<string>fileName.split('/').pop()).replace(/\.\w+$/, '');

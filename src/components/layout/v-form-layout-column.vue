@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import FormLayoutCell from '@/components/FormLayoutCell.vue';
+import FormLayoutCell from '@/components/layout/v-form-layout-cell.vue';
 import { CreateElement } from 'vue';
 
 @Component

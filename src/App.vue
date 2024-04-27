@@ -1,62 +1,73 @@
-<template>
-    <div id="app">
-        <Grid1 class="grid" />
-        <Grid2 class="grid" />
-        <Grid3 class="grid" />
-    </div>
-</template>
-
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-
-import Grid1 from '@/Grid1.vue';
-import Grid2 from '@/Grid2.vue';
-import Grid3 from '@/Grid3.vue';
-
-@Component({
-    components: {
-        Grid1,
-        Grid2,
-        Grid3,
-    },
-})
-export default class App extends Vue {}
+<script setup lang="ts">
+import { RouterView } from 'vue-router'
 </script>
 
-<style lang="scss">
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+<template>
+    <!-- <RouterLink to="/">Home</RouterLink> -->
+
+    <RouterView />
+</template>
+
+<style scoped>
+header {
+    line-height: 1.5;
+    max-height: 100vh;
 }
 
-body {
-    background-color: #dedede;
+.logo {
+    display: block;
+    margin: 0 auto 2rem;
 }
 
-input {
-    outline: none;
-}
-
-#app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-
+nav {
     width: 100%;
-    padding: 10px;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 2rem;
+}
 
-    display: inline-grid;
-    grid-template-columns: repeat(3, 1fr);
-    align-items: flex-start;
-    gap: 24px;
+nav a.router-link-exact-active {
+    color: var(--color-text);
+}
 
-    .grid {
-        padding: 10px;
-        border: 2px solid black;
+nav a.router-link-exact-active:hover {
+    background-color: transparent;
+}
+
+nav a {
+    display: inline-block;
+    padding: 0 1rem;
+    border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+    border: 0;
+}
+
+@media (min-width: 1024px) {
+    header {
+        display: flex;
+        place-items: center;
+        padding-right: calc(var(--section-gap) / 2);
+    }
+
+    .logo {
+        margin: 0 2rem 0 0;
+    }
+
+    header .wrapper {
+        display: flex;
+        place-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    nav {
+        text-align: left;
+        margin-left: -1rem;
+        font-size: 1rem;
+
+        padding: 1rem 0;
+        margin-top: 1rem;
     }
 }
 </style>

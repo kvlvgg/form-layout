@@ -1,21 +1,24 @@
-import Vue from 'vue';
+import './assets/main.css';
+
+import { createApp } from 'vue';
 import App from './App.vue';
-import Fragment from 'vue-fragment';
-import '@/vue.prototype';
+import router from './router';
 
-Vue.config.productionTip = false;
-Vue.use(Fragment.Plugin);
+import FormLayout from '@/components/layout/public/v-form-layout.vue';
+import FormLayoutColumn from '@/components/layout/public/v-form-layout-column.vue';
+import FormLayoutRow from '@/components/layout/public/v-form-layout-row.vue';
+import FormLayoutCell from '@/components/layout/public/v-form-layout-cell.vue';
+import PlaceHolder from '@/components/v-placeholder.vue';
 
-/*
- * Autoimport components, name = filename - .vue
- */
-const requireComponent = require.context('./components', true, /\.(vue|ts)$/);
-requireComponent.keys().forEach((fileName: string) => {
-    const componentConfig = requireComponent(fileName);
-    const componentName = (<string>fileName.split('/').pop()).replace(/\.\w+$/, '');
-    Vue.component(componentName, componentConfig.default || componentConfig);
-});
+const app = createApp(App);
 
-new Vue({
-    render: h => h(App),
-}).$mount('#app');
+app.component('v-form-layout', FormLayout);
+app.component('v-form-layout-column', FormLayoutColumn);
+app.component('v-form-layout-row', FormLayoutRow);
+app.component('v-form-layout-cell', FormLayoutCell);
+app.component('v-placeholder', PlaceHolder);
+
+app.use(router);
+
+app.mount('#app');
+
